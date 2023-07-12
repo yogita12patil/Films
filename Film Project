@@ -1,0 +1,143 @@
+create database Film;
+use Film;
+
+create table artist1(art_id int primary key, art_name varchar(255), art_gender varchar(50));
+insert into artist1(art_id, art_name, art_gender) values('1', 'neha', 'female');
+insert into artist1(art_id, art_name, art_gender) values('2', 'nita', 'female');
+insert into artist1(art_id, art_name, art_gender) values('3', 'gita', 'female');
+insert into artist1(art_id, art_name, art_gender) values('4', 'yug', 'male');
+insert into artist1(art_id, art_name, art_gender) values('5', 'tejas', 'male');
+insert into artist1(art_id, art_name, art_gender) values('6', 'rohit', 'male');
+
+select * from artist1;
+
+
+create table artist(art_id int primary key, art_name varchar(255), art_gender varchar(50));
+
+insert into artist(art_id, art_name, art_gender) values('1', 'aishwarya rai', 'female');
+insert into artist(art_id, art_name, art_gender) values('2', 'madhuri dixit', 'female');
+insert into artist(art_id, art_name, art_gender) values('3', 'rani mukerji', 'female');
+insert into artist(art_id, art_name, art_gender) values('4', 'amitabh bachchan', 'male');
+insert into artist(art_id, art_name, art_gender) values('5', 'salman khan', 'male');
+insert into artist(art_id, art_name, art_gender) values('6', 'shah rukh khan', 'male');
+
+select * from artist;
+
+
+create table producer(prod_id int primary key, prod_name varchar(255), prod_phone varchar(255));
+insert into producer values('1001', 'karan johar', '9800897869');
+insert into producer values('1002', 'ekta kapoor', '8801897888');
+insert into producer values('1003', 'amir khan', '8900897949');
+insert into producer values('1004', 'aditya  chopra', '9960897869');
+insert into producer values('1005', 'bhushan kumar', '9800897869');
+
+create table films(film_id int primary key, film_title varchar(255), film_year int, film_lang varchar(255), prod_id int, art_id int);
+insert into films values('2002', 'Ae Dil Hai Mushkil', '2016', 'hindi', '1001','1');
+insert into films values('2003', 'Dil', '1990', 'hindi', '1003','2');
+insert into films values('2004', 'Mohabbatein', '2000', 'hindi', '1004','4');
+insert into films values('2005', 'Ready', '2011', 'hindi', '1005','5');
+insert into films values('2006', 'DDLJ', '1995', 'hindi', '1001','6');
+
+select * from films;
+
+
+create table casting(art_id int, film_id int, part varchar(255));
+insert into casting values('1', '2002', 'lead heroine');
+insert into casting values('2', '2003', 'lead heroine');
+insert into casting values('4', '2004', 'lead hero');
+insert into casting values('5', '2005', 'lead hero');
+insert into casting values('6', '2006', 'lead hero');
+
+select * from casting;
+
+create table review(film_id int, stars int);
+insert into review values('2002', '5');
+insert into review values('2003', '5');
+insert into review values('2004', '4');
+insert into review values('2005', '3');
+insert into review values('2006', '4');
+
+// Find the name of all the Films whose producer is “NIRAJ”. First we will find the Producer ID for the Producer Named “karan johar” and for this we use the PRODUCER table.
+
+select prod_id from producer where prod_name = 'karan johar';
+
+select film_title from films where prod_id in (select prod_id from producer where prod_name = 'karan johar');
+
+//which movie is releasing on particular releasing date//
+
+select film_title from films where film_year = '2011';
+
+
+
+// Display all artists who acted in a film between 1995 and 2016. //
+
+select a.art_name, f.film_title, f.film_year 
+from artist a, casting c, films f 
+where a.art_id=c.art_id 
+and c.film_id=f.film_id
+and f.film_year between 1995 and 2016;
+
+
+// Display the names of films with the stars received and sort the result on the basis of stars.//
+
+select f.film_title, stars
+from films f, review r
+where f.film_id =r.film_id
+order by r.stars desc;
+
+
+//Update the stars of all films whose producer is ‘karan johar’ to 5.//
+
+select prod_id from producer where prod_name = 'karan johar'; 
+
+select film_id from films where prod_id in(select prod_id from producer where prod_name = 'karan johar');
+
+update review
+set stars=5
+where film_id in(select film_id from films
+where prod_id in(select prod_id
+from producer
+where prod_name = 'karan johar'));
+
+select * from review;
+
+// films n casting join//
+
+
+select * from films join casting on films.film_id= casting.film_id;
+
+// join 2 tables
+
+select * from films left join artist on films.art_id= artist.art_id
+union all
+select * from films right join artist on films.art_id= artist.art_id;
+
+// Drop column from artist1 table
+ alter table artist1
+ drop column art_gender;
+ 
+ Select * from artist1;
+ 
+ // Rename table artist1
+alter table artist1
+rename to artist11;
+
+ Select * from artist11;
+ 
+ // grant & revoke commands
+ 
+create user 'yogita'@'localhost' identified by 'yogita';
+create user 'ajay1'@'localhost' identified by 'ajay1';
+
+grant select on *.* to 'yogita'@'localhost';
+grant insert on film.films to 'yogita'@'localhost';
+
+show grants for 'yogita'@'localhost';
+
+revoke select on *.* from 'yogita'@'localhost';
+revoke insert on film.films from 'yogita'@'localhost';
+
+
+grant update(film_title) on film.films to 'ajay1'@'localhost';
+show grants for 'yogita'@'localhost';
+show grants for 'ajay1'@'localhost';
